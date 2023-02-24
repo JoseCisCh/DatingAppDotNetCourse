@@ -14,6 +14,8 @@ builder.Services.AddDbContext<DataContext>(opt => {
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+/* NEXT LINE: Lesson 24. */
+builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -27,6 +29,9 @@ var app = builder.Build();
 //app.UseHttpsRedirection(); Don't need this now, from http to https
 
 //app.UseAuthorization(); Is not doing anything here
+
+/* NEXT LINE: Lesson 24. */
+app.UseCors(corsBuilder => corsBuilder.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
 
 app.MapControllers();
 
