@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using API.Data;
 using API.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers {
 
@@ -10,9 +11,13 @@ namespace API.Controllers {
         To add this attributes we need Microsoft.AspNetCore.Mvc
     */
 
-    [ApiController]
+/* This can be removed as we created our BaseApiController
+    [ApiController] 
     [Route("api/[controller]")] // /api/users
-    public class UsersController  {
+
+*/
+    [Authorize]
+    public class UsersController: BaseApiController  {
 
         readonly DataContext _context; // It is a convention for some to mark _property for private properties of a class.
         public UsersController(DataContext context)
@@ -20,6 +25,7 @@ namespace API.Controllers {
             this._context = context;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers() {
             var users = await _context.Users.ToListAsync();

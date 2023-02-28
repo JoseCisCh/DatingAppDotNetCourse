@@ -1,21 +1,22 @@
 using API.Data;
+using API.Services;
+using API.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-// NEXT LINE: Lesson 12.
-builder.Services.AddDbContext<DataContext>(opt => {
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
-/* NEXT LINE: Lesson 24. */
-builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -31,7 +32,16 @@ var app = builder.Build();
 //app.UseAuthorization(); Is not doing anything here
 
 /* NEXT LINE: Lesson 24. */
-app.UseCors(corsBuilder => corsBuilder.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
+app.UseCors(corsBuilder => corsBuilder.AllowAnyHeader().AllowAnyMethod()
+    .WithOrigins("https://localhost:4200"));
+
+/* NEXT TWO LINES: Added in lesson 44 
+    They must be after app.UseCors() and before app.MapControllers
+*/
+
+app.UseAuthentication(); // Do you have a token?
+app.UseAuthorization();  // You have a token, let see what you can do.
+
 
 app.MapControllers();
 

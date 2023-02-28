@@ -10,6 +10,9 @@
 *.userosscache
 *.sln.docstates
 
+#CURL requests
+curlRequests.txt
+
 #Files including secrets (added by me)
 appsettings.json
 
