@@ -9,7 +9,7 @@ namespace API.Extensions {
              services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.TokenValidationParameters = new TokenValidationParameters{
-                        ValidateIssuerSigningKey = true, // Check if the token has been signed by the token.
+                        ValidateIssuerSigningKey = true, // Check if the token has been signed by the server.
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"])),
                         ValidateIssuer = false, // 
                         ValidateAudience = false
