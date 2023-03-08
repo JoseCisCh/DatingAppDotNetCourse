@@ -3,6 +3,9 @@ using API.Data;
 using API.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using API.Interfaces;
+using AutoMapper;
+using API.DTOs;
 
 namespace API.Controllers {
 
@@ -19,25 +22,28 @@ namespace API.Controllers {
     [Authorize]
     public class UsersController: BaseApiController  {
 
-        readonly DataContext _context; // It is a convention for some to mark _property for private properties of a class.
-        public UsersController(DataContext context)
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
+
+        public UsersController(IUserRepository userRepository, IMapper mapper)
         {
-            this._context = context;
+            this._userRepository = userRepository;
+            this._mapper = mapper;
         }
 
-        [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers() {
-            var users = await _context.Users.ToListAsync();
-            return users;
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers() {
+           var users = await _userRepository.GetMembersAsync();
+
+           return Ok(users);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<AppUser>> GetUser(int id){
+        [HttpGet("{username}")]
+        public async Task<ActionResult<MemberDto>> GetUser(string username){
 
             // The find method only work with Primary keys of a given table.
-            var user = await _context.Users.FindAsync(id);
-            return user;
+            return await _userRepository.GetMemberAsync(username);
+            
         }
     }
 }

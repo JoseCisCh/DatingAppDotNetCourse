@@ -1,11 +1,7 @@
 using API.Data;
-using API.Services;
-using API.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using API.Extensions;
+using API.Middleware;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +27,9 @@ var app = builder.Build();
 
 //app.UseAuthorization(); Is not doing anything here
 
+// NEXT LINE: Lesson 76.  Setting app to use the ExceptionMiddleware
+app.UseMiddleware<ExceptionMiddleware>();
+
 /* NEXT LINE: Lesson 24. */
 app.UseCors(corsBuilder => corsBuilder.AllowAnyHeader().AllowAnyMethod()
     .WithOrigins("https://localhost:4200"));
@@ -44,5 +43,20 @@ app.UseAuthorization();  // You have a token, let see what you can do.
 
 
 app.MapControllers();
+
+// NEXT LINE: Lesson 88
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+
+try {
+    var context = services.GetRequiredService<DataContext>();
+    await context.Database.MigrateAsync();
+    await Seed.SeedUsers(context);
+} catch (Exception ex) {
+    var logger = services.GetService<ILogger<Program>>();
+    logger.LogError(ex, "An error ocurred during migration");
+}
+
+// Lesson 88 finishes here.
 
 app.Run();
