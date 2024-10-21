@@ -9,6 +9,7 @@ using API.DTOs;
 using System.Security.Claims;
 using API.Extensions;
 using System.Reflection.Metadata.Ecma335;
+using API.Helpers;
 
 namespace API.Controllers {
 
@@ -37,8 +38,10 @@ namespace API.Controllers {
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers() {
-           var users = await _userRepository.GetMembersAsync();
+        public async Task<ActionResult<PagedList<MemberDto>>> GetUsers([FromQuery] UserParams userParams) {
+           var users = await _userRepository.GetMembersAsync(userParams);
+           Response.AddPaginationHeader(new PaginationHeader(users.CurrentPage, users.PageSize
+                                                , users.TotalCount, users.TotalPages));
 
            return Ok(users);
         }
